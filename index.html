@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verificar Presiones</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 400px; margin: auto; }
+    input, button { display: block; width: 100%; padding: 10px; margin: 10px 0; }
+    #resultado { font-weight: bold; font-size: 1.2em; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Presiones (PSI)</h1>
+  <input type="number" id="p1" placeholder="Presión 1">
+  <input type="number" id="p2" placeholder="Presión 2">
+  <input type="number" id="p3" placeholder="Presión 3">
+  <input type="number" id="p4" placeholder="Presión 4">
+  <button onclick="validar()">✅ Verificar</button>
+  <button onclick="enviarCorreo()">📤 Enviar pruebas aprobadas</button>
+  <div id="resultado"></div>
+
+  <!-- EmailJS v4 -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    // Inicializar EmailJS con tu clave pública real
+    (function () {
+      emailjs.init("tlcM6igKsBWhU-7x1", // <-- reemplaza esto con la real
+      );
+    })();
+
+    function validar() {
+      const p1 = parseFloat(document.getElementById("p1").value);
+      const p2 = parseFloat(document.getElementById("p2").value);
+      const p3 = parseFloat(document.getElementById("p3").value);
+      const p4 = parseFloat(document.getElementById("p4").value);
+
+      if ([p1, p2, p3, p4].some(isNaN)) {
+        document.getElementById("resultado").innerText = "⚠️ Faltan presiones.";
+        return;
+      }
+
+      const promedio = (p1 + p2 + p3 + p4) / 4;
+      const aprobado = promedio < 20; // Cambia a promedio < 20 si eso era lo correcto
+      const resultado = aprobado ? "✅ Aprobado" : "❌ Repite";
+      document.getElementById("resultado").innerText = `${resultado} | Promedio: ${promedio.toFixed(2)} PSI`;
+
+      if (aprobado) {
+        const prueba = {
+          presiones: [p1, p2, p3, p4],
+          promedio: promedio,
+          fecha: new Date().toLocaleString()
+        };
+
+        let aprobadas = JSON.parse(localStorage.getItem("pruebasAprobadas")) || [];
+        aprobadas.push(prueba);
+        localStorage.setItem("pruebasAprobadas", JSON.stringify(aprobadas));
+
+        // Limpiar los inputs
+        document.getElementById("p1").value = "";
+        document.getElementById("p2").value = "";
+        document.getElementById("p3").value = "";
+        document.getElementById("p4").value = "";
+      }
+    }
+
+    function enviarCorreo() {
+      const pruebas = JSON.parse(localStorage.getItem("pruebasAprobadas")) || [];
+
+      if (pruebas.length === 0) {
+        alert("No hay pruebas aprobadas para enviar.");
+        return;
+      }
+
+      const contenido = pruebas.map((p, i) => {
+        return `#${i + 1} - ${p.fecha}\nPresiones: ${p.presiones.join(", ")}\nPromedio: ${p.promedio.toFixed(2)} PSI\n`;
+      }).join("\n----------------\n");
+
+      const params = {
+        to_name: "Valser",
+        to_email: "tecnicodeservicios@valserindustriales.com",
+        message: contenido
+      };
+
+      emailjs.send("service_vp5zw8m", "template_6v8y173", params)
+        .then(() => {
+          alert("📤 Correo enviado con éxito ✅");
+          localStorage.removeItem("pruebasAprobadas");
+        })
+        .catch((error) => {
+          console.error("Error al enviar:", error);
+          alert("❌ Error al enviar el correo.");
+        });
+    }
+
+    // Registrar Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log("SW registrado correctamente"))
+        .catch((e) => console.error("SW falló", e));
+    }
+  </script>
+</body>
+</html>
