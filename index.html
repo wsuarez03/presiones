@@ -6,20 +6,75 @@
   <title>Verificar Presiones</title>
   <link rel="manifest" href="manifest.json" />
   <style>
-    body { font-family: sans-serif; padding: 20px; max-width: 400px; margin: auto; }
-    input, button { display: block; width: 100%; padding: 10px; margin: 10px 0; }
-    #resultado { font-weight: bold; font-size: 1.2em; margin-top: 20px; }
+    /* Estilo general del body */
+    body { 
+      font-family: sans-serif; 
+      padding: 20px; 
+      max-width: 450px; 
+      margin: auto; 
+      background-color: #f9f9f9; /* Fondo suave */
+      color: #333; /* Color de texto oscuro */
+    }
+  
+    /* Estilo de los inputs y botones */
+    input, select, button { 
+      display: block; 
+      width: 100%; 
+      padding: 12px; 
+      margin: 10px 0; 
+      border-radius: 6px; 
+      border: 1px solid #ccc; 
+      font-size: 16px; 
+      box-sizing: border-box; 
+      background-color: #fff; /* Fondo blanco */
+    }
+  
+    /* Colores de botones para una mejor experiencia */
+    button {
+      background-color: #4CAF50; /* Verde para botones */
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  
+    button:hover {
+      background-color: #45a049; /* Sombra más oscura al pasar el ratón */
+    }
+  
+    /* Estilo del resultado */
+    #resultado { 
+      font-weight: bold; 
+      font-size: 1.2em; 
+      margin-top: 20px; 
+      color: #333;
+    }
+  
+    /* Espaciado entre los elementos */
+    input, select, button {
+      margin-bottom: 15px;
+    }
   </style>
 </head>
 <body>
   <h1>Presiones (PSI)</h1>
-  <input type="number" id="p1" placeholder="Presión 1">
-  <input type="number" id="p2" placeholder="Presión 2">
-  <input type="number" id="p3" placeholder="Presión 3">
-  <input type="number" id="p4" placeholder="Presión 4">
+  <input type="number" id="set" placeholder="Set de presión válvula">
+  <label for="sel_val"></label>
+  <select id="sel_val">
+    <option value="Sección válvula" disabled selected>Sección válvula</option>
+    <option value="Sec. I">Sec. I</option>
+    <option value="Sec. VIII">Sec. VIII</option>
+  </select>
+  <input type="number" id="p1" placeholder="Escape 1 (PSI)">
+  <input type="number" id="p2" placeholder="Escape 2 (PSI)">
+  <input type="number" id="p3" placeholder="Escape 3 (PSI)">
+  <input type="number" id="p4" placeholder="Escape 4 (PSI)">
   <button onclick="validar()">✅ Verificar</button>
   <button onclick="enviarCorreo()">📤 Enviar pruebas aprobadas</button>
   <div id="resultado"></div>
+  <div id="limite"></div>  
+  <div id="limiteSuperior"></div>
+  <div id="limiteInferior"></div>
+
 
   <!-- EmailJS v4 -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -31,27 +86,58 @@
     })();
 
     function validar() {
+      const set = parseFloat(document.getElementById("set").value);
+      const sel_val = document.getElementById("sel_val").value;;
       const p1 = parseFloat(document.getElementById("p1").value);
       const p2 = parseFloat(document.getElementById("p2").value);
       const p3 = parseFloat(document.getElementById("p3").value);
       const p4 = parseFloat(document.getElementById("p4").value);
 
+      if ([set].some(isNaN)) {
+        document.getElementById("resultado").innerText = "⚠️ Falta set de presión válvula.";
+        return;
+      }
+      if (sel_val === "Sección válvula") {
+        document.getElementById("resultado").innerText = "⚠️ Debes seleccionar la sección de la válvula.";
+         return;
+      }
       if ([p1, p2, p3, p4].some(isNaN)) {
         document.getElementById("resultado").innerText = "⚠️ Faltan presiones.";
         return;
       }
 
       const promedio = (p1 + p2 + p3 + p4) / 4;
+      let limite = 0;
+      let limiteInferior = 0;
+      let limiteSuperior = 0;
+
+      if (promedio > 50) {
+      limite = promedio * 0.01;
+      limiteSuperior = promedio + limite;
+      limiteInferior = promedio - limite;
+      
+        // Mostrar en pantalla
+      document.getElementById("limite").innerText = `🔽 Límite: ${limite.toFixed(2)} PSI`;
+      document.getElementById("limiteInferior").innerText = `🔽 Límite Inferior: ${limiteInferior.toFixed(2)} PSI`;
+      document.getElementById("limiteSuperior").innerText = `🔼 Límite Superior: ${limiteSuperior.toFixed(2)} PSI`;
+      } else {
+        // Limpiar si el promedio no aplica
+      document.getElementById("limite").innerText = "";
+      document.getElementById("limiteInferior").innerText = "";
+      document.getElementById("limiteSuperior").innerText = "";
+      }
       const aprobado = promedio < 20; // Cambia a promedio < 20 si eso era lo correcto
       const resultado = aprobado ? "✅ Aprobado" : "❌ Repite";
       document.getElementById("resultado").innerText = `${resultado} | Promedio: ${promedio.toFixed(2)} PSI`;
 
       if (aprobado) {
         const prueba = {
-          presiones: [p1, p2, p3, p4],
-          promedio: promedio,
-          fecha: new Date().toLocaleString()
-        };
+        set: set,
+        seccion: sel_val,
+        presiones: [p1, p2, p3, p4],
+        promedio: promedio,
+        fecha: new Date().toLocaleString()
+      };
 
         let aprobadas = JSON.parse(localStorage.getItem("pruebasAprobadas")) || [];
         aprobadas.push(prueba);
@@ -74,8 +160,12 @@
       }
 
       const contenido = pruebas.map((p, i) => {
-        return `#${i + 1} - ${p.fecha}\nPresiones: ${p.presiones.join(", ")}\nPromedio: ${p.promedio.toFixed(2)} PSI\n`;
-      }).join("\n----------------\n");
+        return `#${i + 1} - ${p.fecha}
+        Set de presión: ${p.set} PSI
+        Sección: ${p.seccion}
+        Presiones: ${p.presiones.join(", ")}
+        Promedio: ${p.promedio.toFixed(2)} PSI`;
+        }).join("\n----------------\n");
 
       const params = {
         to_name: "Valser",
