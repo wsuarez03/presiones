@@ -126,7 +126,7 @@
       document.getElementById("limiteInferior").innerText = "";
       document.getElementById("limiteSuperior").innerText = "";
       }
-      const aprobado = promedio >= limiteSuperior & promedio <= limiteInferior; 
+      const aprobado = promedio >= limiteSuperior && promedio <= limiteInferior; 
       const resultado = aprobado ? "✅ Aprobado" : "❌ Repite";
       document.getElementById("resultado").innerText = `${resultado} | Promedio: ${promedio.toFixed(2)} PSI`;
 
