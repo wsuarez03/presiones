@@ -111,8 +111,8 @@
       let limiteInferior = 0;
       let limiteSuperior = 0;
 
-      if (promedio > 50) {
-      limite = promedio * 0.01;
+    
+      limite = promedio > 50 ? promedio * 0.01: promedio 0.5;
       limiteSuperior = promedio + limite;
       limiteInferior = promedio - limite;
       
@@ -120,12 +120,7 @@
       document.getElementById("limite").innerText = `📏 Límite: ${limite.toFixed(2)} PSI`;
       document.getElementById("limiteInferior").innerText = `🔽 Límite Inferior: ${limiteInferior.toFixed(2)} PSI`;
       document.getElementById("limiteSuperior").innerText = `🔼 Límite Superior: ${limiteSuperior.toFixed(2)} PSI`;
-      } else {
-        // Limpiar si el promedio no aplica
-      document.getElementById("limite").innerText = "";
-      document.getElementById("limiteInferior").innerText = "";
-      document.getElementById("limiteSuperior").innerText = "";
-      }
+
       const aprobado = promedio >= limiteSuperior && promedio <= limiteInferior; 
       const resultado = aprobado ? "✅ Aprobado" : "❌ Repite";
       document.getElementById("resultado").innerText = `${resultado} | Promedio: ${promedio.toFixed(2)} PSI`;
