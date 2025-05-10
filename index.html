@@ -112,7 +112,11 @@
       let limiteSuperior = 0;
 
     
-      limite = promedio > 50 ? promedio * 0.01: promedio * 0.5;
+      if (promedio > 50){
+      limite = promedio * 0.01;
+        limite = promedio * 0.5;
+      }
+
       limiteSuperior = promedio + limite;
       limiteInferior = promedio - limite;
       
