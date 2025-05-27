@@ -95,7 +95,7 @@
       const p3 = parseFloat(document.getElementById("p3").value);
       const p4 = parseFloat(document.getElementById("p4").value);
 
-      if (!tag) {
+      if (!Tag) {
         document.getElementById("resultado").innerText = "⚠️ Falta Tag/Serial.";
         return;
       }
@@ -139,7 +139,7 @@
 
       if (aprobado) {
         const prueba = {
-        Tag: tag,
+        tag: tag,
         set: set,
         seccion: sel_val,
         presiones: [p1, p2, p3, p4],
