@@ -87,7 +87,7 @@
     })();
 
     function validar() {
-      const tag = document.getElementById("Tag").value);
+      const tag = document.getElementById("Tag").value;
       const set = parseFloat(document.getElementById("set").value);
       const sel_val = document.getElementById("sel_val").value;;
       const p1 = parseFloat(document.getElementById("p1").value);
@@ -169,7 +169,7 @@
 
       const contenido = pruebas.map((p, i) => {
         return `#${i + 1} - ${p.fecha}
-        Tag: ${p.Tag}
+        Tag: ${p.tag}
         Set de presión: ${p.set} PSI
         Sección: ${p.seccion}
         Presiones: ${p.presiones.join(", ")}
