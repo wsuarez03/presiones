@@ -95,6 +95,10 @@
       const p3 = parseFloat(document.getElementById("p3").value);
       const p4 = parseFloat(document.getElementById("p4").value);
 
+      if ([Tag].some(isNaN)) {
+        document.getElementById("resultado").innerText = "⚠️ Falta Tag/Serial.";
+        return;
+      }
       if ([set].some(isNaN)) {
         document.getElementById("resultado").innerText = "⚠️ Falta set de presión válvula.";
         return;
@@ -135,6 +139,7 @@
 
       if (aprobado) {
         const prueba = {
+        Tag: tag,
         set: set,
         seccion: sel_val,
         presiones: [p1, p2, p3, p4],
