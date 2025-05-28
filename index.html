@@ -104,7 +104,7 @@
     function validar() {
       const tag = document.getElementById("Tag").value;
       const set = parseFloat(document.getElementById("set").value);
-      const sel_val = document.getElementById("sel_val").value;;
+      const sel_prueb = document.getElementById("sel_prueb").value;;
       const p1 = parseFloat(document.getElementById("p1").value);
       const p2 = parseFloat(document.getElementById("p2").value);
       const p3 = parseFloat(document.getElementById("p3").value);
@@ -118,8 +118,8 @@
         document.getElementById("resultado").innerText = "⚠️ Falta set de presión válvula.";
         return;
       }
-      if (sel_val === "Sección válvula") {
-        document.getElementById("resultado").innerText = "⚠️ Debes seleccionar la sección de la válvula.";
+      if (sel_prueb === "Tipo de prueba") {
+        document.getElementById("resultado").innerText = "⚠️ Debes seleccionar el tipo de prueba.";
          return;
       }
       if ([p1, p2, p3, p4].some(isNaN)) {
@@ -156,7 +156,7 @@
         const prueba = {
         tag: tag,
         set: set,
-        seccion: sel_val,
+        seccion: sel_prueb,
         presiones: [p1, p2, p3, p4],
         promedio: promedio,
         fecha: new Date().toLocaleString()
