@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verificación De Presiones</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      max-width: 450px;
+      margin: auto;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    .titulo {
+      text-align: left;
+    }
+
+    @media (max-width: 600px) {
+      .titulo {
+        text-align: center;
+      }
+      .fila-doble {
+        flex-direction: column;
+      }
+    }
+
+    input, select {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin: 6px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      box-sizing: border-box;
+      background-color: #fff;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 6px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #resultado {
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-top: 20px;
+      color: #333;
+      white-space: pre-line;
+    }
+
+    .logo {
+      display: block;
+      margin: 0 auto 20px;
+      max-width: 250px;
+      height: auto;
+    }
+
+    .fila-doble {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .columna {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+  </style>
+</head>
+<body>
+  <img src="LOGO VALSER.png" alt="Logo" class="logo">
+  <h1 class="titulo">PRUEBAS EN BANCO O VST</h1>
+
+  <input type="text" id="Client_Proy" placeholder="Cliente/Proyecto">
+
+  <div class="fila-doble">
+    <div class="columna">
+      <input type="text" id="Tag" placeholder="Tag/Serial">
+      <input type="number" id="set" placeholder="Set de presión válvula">
+    </div>
+    <div class="columna">
+      <select id="sel_seccion">
+        <option value="Sección válvula" disabled selected>Sección válvula</option>
+        <option value="Sec. I">Sec. I</option>
+        <option value="Sec. VIII">Sec. VIII</option>
+      </select>
+      <select id="sel_prueb">
+        <option value="Tipo de prueba" disabled selected>Tipo de prueba</option>
+        <option value="Banco">Banco</option>
+        <option value="VST">VST</option>
+      </select>
+    </div>
+  </div>
+
+  <input type="number" id="p1" placeholder="Escape 1 (PSI)">
+  <input type="number" id="p2" placeholder="Escape 2 (PSI)">
+  <input type="number" id="p3" placeholder="Escape 3 (PSI)">
+  <input type="number" id="p4" placeholder="Escape 4 (PSI)">
+
+  <button onclick="validar()">✅ Verificar</button>
+  <button onclick="enviarCorreo()">📤 Enviar pruebas aprobadas</button>
+
+  <div id="resultado"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const selPrueba = document.getElementById("sel_prueb");
+      const p4 = document.getElementById("p4");
+
+      function togglePresiones() {
+        if (selPrueba.value === "VST") {
+          p4.style.display = "none";
+          p4.value = "";
+        } else {
+          p4.style.display = "block";
+        }
+      }
+
+      togglePresiones();
+      selPrueba.addEventListener("change", togglePresiones);
+    });
+
+    (function () {
+      emailjs.init("tlcM6igKsBWhU-7x1");
+    })();
+
+    function mostrarMensaje(msg) {
+      document.getElementById("resultado").innerText = msg;
+    }
+
+    function validar() {
+      const client_proy = document.getElementById("Client_Proy").value.trim();
+      const tag = document.getElementById("Tag").value.trim();
+      const set = parseFloat(document.getElementById("set").value);
+      const seccion = document.getElementById("sel_seccion").value;
+      const tipo = document.getElementById("sel_prueb").value;
+      const p1 = parseFloat(document.getElementById("p1").value);
+      const p2 = parseFloat(document.getElementById("p2").value);
+      const p3 = parseFloat(document.getElementById("p3").value);
+      const p4 = parseFloat(document.getElementById("p4").value);
+
+      if (!client_proy) return mostrarMensaje("⚠️ Falta Cliente/Proyecto.");
+      if (!tag) return mostrarMensaje("⚠️ Falta Tag/Serial.");
+      if (isNaN(set)) return mostrarMensaje("⚠️ Falta set de presión válvula.");
+      if (seccion === "Sección válvula") return mostrarMensaje("⚠️ Debes seleccionar la sección válvula.");
+      if (tipo === "Tipo de prueba") return mostrarMensaje("⚠️ Debes seleccionar el tipo de prueba.");
+
+      let presiones = [
+        { nombre: "Escape 1", valor: p1 },
+        { nombre: "Escape 2", valor: p2 },
+        { nombre: "Escape 3", valor: p3 }
+      ];
+      if (tipo === "Banco") {
+        presiones.push({ nombre: "Escape 4", valor: p4 });
+      }
+
+      if (presiones.some(p => isNaN(p.valor))) {
+        return mostrarMensaje(`⚠️ Faltan presiones para ${tipo}`);
+      }
+
+      const promedio = presiones.reduce((acc, p) => acc + p.valor, 0) / presiones.length;
+      const deltaRep = promedio > 50 ? promedio * 0.01 : 0.5;
+      const infRep = promedio - deltaRep;
+      const supRep = promedio + deltaRep;
+
+      let deltaSeccion = 0;
+      if (seccion === "Sec. I") {
+        if (set <= 70) deltaSeccion = 2;
+        else if (set <= 300) deltaSeccion = set * 0.03;
+        else if (set <= 1000) deltaSeccion = 10;
+        else deltaSeccion = set * 0.01;
+      } else if (seccion === "Sec. VIII") {
+        deltaSeccion = set <= 70 ? 2 : set * 0.03;
+      }
+
+      const ajuste = set <= 500 ? 0.2 : set <= 1000 ? 1 : 1.8;
+      const infSeccion = set - deltaSeccion + ajuste;
+      const supSeccion = set + deltaSeccion - ajuste;
+
+      const erroresRep = presiones
+        .filter(p => p.valor < infRep || p.valor > supRep)
+        .map(p => `${p.nombre}: ${p.valor} PSI fuera del rango de repetibilidad`);
+
+      const erroresSec = presiones
+        .filter(p => p.valor < infSeccion || p.valor > supSeccion)
+        .map(p => `${p.nombre}: ${p.valor} PSI fuera del rango por sección`);
+
+      const aprobado = erroresRep.length === 0 && erroresSec.length === 0;
+
+      let resultado = aprobado ? "✅ Aprobado" : "❌ Repite";
+      if (erroresRep.length > 0) resultado += "\n\n- Falló prueba de repetibilidad\n" + erroresRep.join("\n");
+      if (erroresSec.length > 0) resultado += "\n\n- Falló prueba por sección\n" + erroresSec.join("\n");
+      resultado += `\n\nRango repetibilidad: ${infRep.toFixed(2)} - ${supRep.toFixed(2)} PSI`;
+      resultado += `\nRango por sección: ${infSeccion.toFixed(2)} - ${supSeccion.toFixed(2)} PSI`;
+      mostrarMensaje(resultado);
+
+      if (aprobado) {
+        const prueba = {
+          client_proy, tag, set, seccion: tipo,
+          presiones: presiones.map(p => p.valor),
+          promedio, fecha: new Date().toLocaleString()
+        };
+        const aprobadas = JSON.parse(localStorage.getItem("pruebasAprobadas")) || [];
+        aprobadas.push(prueba);
+        localStorage.setItem("pruebasAprobadas", JSON.stringify(aprobadas));
+
+        document.getElementById("Tag").value = "";
+        document.getElementById("p1").value = "";
+        document.getElementById("p2").value = "";
+        document.getElementById("p3").value = "";
+        document.getElementById("p4").value = "";
+      }
+    }
+
+    function enviarCorreo() {
+      const pruebas = JSON.parse(localStorage.getItem("pruebasAprobadas")) || [];
+      if (pruebas.length === 0) return alert("No hay pruebas aprobadas para enviar.");
+
+      const contenido = pruebas.map((p, i) =>
+        `#${i + 1} - ${p.fecha}\nCliente: ${p.client_proy}\nTag: ${p.tag}\nSet de presión: ${p.set} PSI\nSección: ${p.seccion}\nPresiones: ${p.presiones.join(", ")}\nPromedio: ${p.promedio.toFixed(2)} PSI`
+      ).join("\n----------------\n");
+
+      const params = {
+        to_name: "Valser",
+        to_email: "tecnicodeservicios@valserindustriales.com",
+        message: contenido
+      };
+
+      emailjs.send("service_vp5zw8m", "template_6v8y173", params)
+        .then(() => {
+          alert("📤 Correo enviado con éxito ✅");
+          localStorage.removeItem("pruebasAprobadas");
+        })
+        .catch((error) => {
+          console.error("Error al enviar:", error);
+          alert("❌ Error al enviar el correo.");
+        });
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log("SW registrado correctamente"))
+        .catch((e) => console.error("SW falló", e));
+    }
+  </script>
+</body>
+</html>
