@@ -9,14 +9,15 @@
   "scope": "./",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/4162/4162811.png",
+      "src": "icon-12.jpeg",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/4162/4162811.png",
+      "src": "icon-12.jpeg",
       "sizes": "192x192",
       "type": "image/png"
     }
   ]
+
 }
