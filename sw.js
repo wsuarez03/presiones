@@ -1,11 +1,12 @@
 const CACHE_NAME = 'presiones-cache-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/sw.js',
+  './',
+  './index.html',
+  './manifest.json',
+  './sw.js',
   'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js',
-  'icon-12.png',
+  './icon-512.png',
+  './icon-192.png',
 ];
 
 self.addEventListener('install', event => {
@@ -44,4 +45,5 @@ self.addEventListener('activate', event => {
   );
 
 });
+
 
