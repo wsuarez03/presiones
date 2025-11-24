@@ -5,7 +5,7 @@ const urlsToCache = [
   '/manifest.json',
   '/sw.js',
   'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js',
-  'https://cdn-icons-png.flaticon.com/512/4162/4162811.png',
+  'icon-12.jpeg',
 ];
 
 self.addEventListener('install', event => {
@@ -42,4 +42,5 @@ self.addEventListener('activate', event => {
       )
     )
   );
+
 });
