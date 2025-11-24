@@ -5,7 +5,7 @@ const urlsToCache = [
   '/manifest.json',
   '/sw.js',
   'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js',
-  'icon-12.jpeg',
+  'icon-12.png',
 ];
 
 self.addEventListener('install', event => {
@@ -44,3 +44,4 @@ self.addEventListener('activate', event => {
   );
 
 });
+
