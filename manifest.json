@@ -9,15 +9,16 @@
   "scope": "./",
   "icons": [
     {
-      "src": "icon-12.jpeg",
+      "src": "icon-12.png",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "icon-12.jpeg",
+      "src": "icon-12.png",
       "sizes": "192x192",
       "type": "image/png"
     }
   ]
 
 }
+
