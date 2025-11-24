@@ -107,6 +107,14 @@
         <option value="Banco">Banco</option>
         <option value="VST">VST</option>
       </select>
+            <select id="manometro">
+        <option value="Manometro" disabled selected>Manómetro</option>
+        <option value="MAN-001">MAN-001</option>
+        <option value="MAN-002">MAN-002</option>
+        <option value="MAN-003">MAN-003</option>
+        <option value="MAN-005">MAN-005</option>
+        <option value="MAN-006">MAN-006</option>
+      </select>
     </div>
   </div>
 
@@ -153,6 +161,7 @@
       const set = parseFloat(document.getElementById("set").value);
       const seccion = document.getElementById("sel_seccion").value;
       const tipo = document.getElementById("sel_prueb").value;
+      const manometro = document.getElementById("manometro").value;
       const p1 = parseFloat(document.getElementById("p1").value);
       const p2 = parseFloat(document.getElementById("p2").value);
       const p3 = parseFloat(document.getElementById("p3").value);
