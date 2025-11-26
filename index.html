@@ -95,13 +95,12 @@
     <div class="columna">
       <input type="text" id="Tag" placeholder="Tag/Serial">
       <input type="number" id="set" placeholder="Set de presión válvula">
-      <select id="manometro">
+      <select id="manometro" style="display:none;">
         <option value="Manómetro" disabled selected>Manómetro</option>
-        <option value="MAN-001">MAN-001</option>
-        <option value="MAN-002">MAN-002</option>
-        <option value="MAN-003">MAN-003</option>
-        <option value="MAN-005">MAN-005</option>
-        <option value="MAN-006">MAN-006</option>
+        <option value="MAN-002 (Crystal 5k)">MAN-002 (Crystal 5k)</option>
+        <option value="MAN-003 (Additel)">MAN-003 (Additel)</option>
+        <option value="MAN-005 (Crystal 1k)">MAN-005 (Crystal 1k)</option>
+        <option value="MAN-006 (Wika)">MAN-006 (Wika)</option>
       </select>
     </div>
     <div class="columna">
@@ -147,6 +146,20 @@
       selPrueba.addEventListener("change", togglePresiones);
     });
 
+    // Ocultar/mostrar manómetro
+      const manometro = document.getElementById("manometro");
+      function toggleManometro() {
+        if (selPrueba.value === "Banco") {
+          manometro.style.display = "block";
+        } else {
+          manometro.style.display = "none";
+          manometro.value = "Manómetro";
+  }
+}
+toggleManometro();
+selPrueba.addEventListener("change", toggleManometro);("change", togglePresiones);
+});
+
     (function () {
       emailjs.init("tlcM6igKsBWhU-7x1");
     })();
@@ -170,7 +183,7 @@
       if (!client_proy) return mostrarMensaje("⚠️ Falta Cliente/Proyecto.");
       if (!tag) return mostrarMensaje("⚠️ Falta Tag/Serial.");
       if (isNaN(set)) return mostrarMensaje("⚠️ Falta set de presión válvula.");
-      if (manometro === "Manómetro") return mostrarMensaje("⚠️ Debes seleccionar manómetro.");
+      if (tipo === "Banco" && manometro === "Manómetro") return mostrarMensaje("⚠️ Debes seleccionar manómetro.");
       if (seccion === "Sección válvula") return mostrarMensaje("⚠️ Debes seleccionar la sección válvula.");
       if (tipo === "Tipo de prueba") return mostrarMensaje("⚠️ Debes seleccionar el tipo de prueba.");
 
@@ -274,6 +287,7 @@
   </script>
 </body>
 </html>
+
 
 
 
